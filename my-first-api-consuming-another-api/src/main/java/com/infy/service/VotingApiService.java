@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.infy.intercepters.MyRequestLoggerInterceptor;
 import com.infy.model.Person;
 import com.infy.model.Student;
 import com.infy.model.Student2;
@@ -23,6 +25,12 @@ public class VotingApiService {
 
 	public ResponseEntity<List<Student>> getAllStudent() {
 		String url = "http://localhost:8001/my-first-rest-api-using-spring-mvc/students";
+		
+		List<ClientHttpRequestInterceptor> myInterceptorList = new ArrayList<>();
+		myInterceptorList.add(new MyRequestLoggerInterceptor());
+		restTemplate.setInterceptors(myInterceptorList);
+		
+//		restTemplate.setInterceptors(Collections.singletonList(new MyRequestLoggerIntercepter()));
 
 		List<Student> list = restTemplate.getForObject(url, List.class);
 
@@ -47,6 +55,24 @@ public class VotingApiService {
 		resHeaders.add("pqr", "aaaa");
 
 		return ResponseEntity.ok().headers(resHeaders).body(retrivedStd);
+	}
+
+	public ResponseEntity<String> updateStudent(Student std) {
+
+		String url = "http://localhost:8001/my-first-rest-api-using-spring-mvc/students";
+
+		try {
+			restTemplate.put(url, std);
+		} catch (Exception e) {
+			System.out.println("Exception while calling update api " + e.getMessage());
+			return new ResponseEntity<String>("Error while updating the student", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		HttpHeaders resHeaders = new HttpHeaders();
+		resHeaders.add("xyz", "123");
+		resHeaders.add("pqr", "aaaa");
+
+		return ResponseEntity.ok().headers(resHeaders).body("Updated Successfully");
 	}
 
 	public ResponseEntity<String> doVoting() {
@@ -80,5 +106,24 @@ public class VotingApiService {
 		}
 
 		return ResponseEntity.ok().body(filteredStudents);
+	}
+
+	public ResponseEntity<String> deleteStudent(int id) {
+		
+		String url = "http://localhost:8001/my-first-rest-api-using-spring-mvc/students/ "+id;
+
+		try {
+			restTemplate.delete(url,id);
+		} catch (Exception e) {
+			System.out.println("Exception while calling Delete api " + e.getMessage());
+			e.printStackTrace();
+			return new ResponseEntity<String>("Error while deleting the student..!!!", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		HttpHeaders resHeaders = new HttpHeaders();
+		resHeaders.add("xyz", "123");
+		resHeaders.add("pqr", "aaaa");
+
+		return ResponseEntity.ok().headers(resHeaders).body("Deleted Successfully..!!");
 	}
 }

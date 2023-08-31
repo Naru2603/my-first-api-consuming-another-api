@@ -12,7 +12,7 @@ public class MyRestController {
 
 	@Autowired
 	VotingApiService apiService;
-	
+
 	@GetMapping("/voting")
 	public ResponseEntity<String> doVoting() {
 		return apiService.doVoting();

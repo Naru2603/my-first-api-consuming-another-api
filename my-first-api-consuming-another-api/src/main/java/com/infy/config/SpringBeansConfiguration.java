@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @ComponentScan(basePackages = "com.infy")
 public class SpringBeansConfiguration {
 
-
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
